@@ -14,13 +14,14 @@ public class MapperTP extends Mapper < Text, Text, LongWritable, Text > {
     protected void map(Text key, Text value, Context context)
             throws IOException, InterruptedException {
 		/*
-			ourmapper: <key: line number, value: content of the line>
+			ourmapper: <key: line number, value:(column_number, value)>
 		 */
         // split each value of each line
         String [] arr = key.toString().split(",");
 
         for (int i=0; i<arr.length;i++){
-            // every value of each field of th ith line is associated to key=n
+            // key = number of line
+	    // value (column_number, value_Of_Column)
             context.write(new LongWritable(n),new Text(i + "/" + arr[i]));
 
         }
@@ -30,7 +31,7 @@ public class MapperTP extends Mapper < Text, Text, LongWritable, Text > {
     @Override
     protected void cleanup (Context c) throws IOException{
 		/*
-			send a message to reduce to inform him that we have atteined the end of file
+			send a message to reducer to inform him that we have reached the end of file.
 		 */
         try{
             c.write(new LongWritable(Long.MAX_VALUE),new Text(""));
