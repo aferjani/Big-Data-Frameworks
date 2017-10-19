@@ -1,0 +1,62 @@
+
+// map function take a key and a value as input from file.
+int n=0;
+protected void map (Text key, Text value, Context context){
+	// key=line number; value = (column_number / valueofColumn)
+	String [] arr = key.toString().split(","); // split elements
+
+	for (int i=0; i<arr.length;i++){
+            // (key=line_number, value=(column_number, value)))
+            context.write(new LongWritable(n),new Text(i + "/" + arr[i]));
+
+        }
+        n++;
+}
+/*
+the map function output is the number of line as key and the (column position + value) as value.
+*/
+
+
+#####################################################
+-----------------------------------------------------
+#####################################################
+
+
+Vector<Vector<String>> out = new Vector<Vector<String>>(); // vector of  vectors which will hold reducer output.
+
+// reduce take as arguments key (#line number) and list of tuples as value
+public void reduce (LongWritable key, Iterable<Text> values, Context context){
+		//fill out with values
+
+            for (Text t : values) {
+
+		//for every element after shuffle and sorting get value of column and its position
+                String[] arr = t.toString().split("/");
+		int k = Integer.parseInt(arr[0]);
+
+		// add anew element to out vector
+                while (out.size() <= k) {
+                    out.add(new Vector<String>());
+
+                }
+
+                out.get(k).add(arr[1]); // add the value at the corresponding line
+            }
+
+	if (file reached the end)
+		// display values of the transpose of matrix
+
+             for (int i = 0; i < out.size(); i++) {
+
+                // ret is a string that contains the transpose of a csv file.
+                String ret = "";
+
+                for (int j = 0; j < out.get(i).size() - 1; j++) {
+                    ret += out.get(i).get(j) + ",";
+                }
+
+                ret += out.get(i).get(out.get(i).size() - 1);
+
+   		
+                context.write(NullWritable.get(), new Text(ret));
+}
