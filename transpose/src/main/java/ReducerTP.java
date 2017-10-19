@@ -19,24 +19,19 @@ public class ReducerTP extends Reducer< LongWritable, Text, NullWritable, Text >
             throws IOException, InterruptedException {
 
         // verify if mapper has finsished its job to get the final result and display it
-        //System.out.println("Key : " + key);
-        //System.out.println("Values : ");
-        //for (Text t : values)
-        //    System.out.print(t + " ");
-        //System.out.println();
         if(key.get() == Long.MAX_VALUE){
             for (int i = 0; i < out.size(); i++) {
                 // ret is a string that contains the transpose of a csv file.
-                //System.out.println(out.get(i));
+                // construct the outpout result to be displayed in a csv format.
                 String ret = "";
                 for (int j = 0; j < out.get(i).size() - 1; j++) {
                     ret += out.get(i).get(j) + ",";
                 }
                 ret += out.get(i).get(out.get(i).size() - 1);
 
-                System.out.println(ret);  // uncomment the following line if you want to see results
+                //System.out.println(ret);  // uncomment the following line if you want to see results
+		    
                 //Get value from context.write, no key is needed
-                //System.out.println(ret);
                 context.write(NullWritable.get(), new Text(ret));
             }
         } else {
@@ -44,12 +39,14 @@ public class ReducerTP extends Reducer< LongWritable, Text, NullWritable, Text >
             // (i.e: get the first value and assign it to the first vector, the second value to the second vector etc...
 
             for (Text t : values) {
+		    // for every value= (column_number/valueOfCloumn) get the column number and the the associated value
                 String[] arr = t.toString().split("/");
                 int k = Integer.parseInt(arr[0]);
+		    // add a new element to our output vector
                 while (out.size() <= k) {
                     out.add(new Vector<String>());
                 }
-
+		// add a new value to the corresponding vector
                 out.get(k).add(arr[1]);
             }
         }
